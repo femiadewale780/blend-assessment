@@ -14,12 +14,13 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
+        shell: bash
         working-directory: terraform
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Terraform
-      - uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.6.6"
           terraform_wrapper: false
@@ -27,24 +28,28 @@ jobs:
       - name: Terraform fmt (check)
         run: terraform fmt -check -recursive
 
-      - name: Terraform init
+      - name: Terraform init (no backend)
         run: terraform init -backend=false
 
       - name: Terraform validate
         run: terraform validate
 
-      - name: Install tflint
-        run: |
-          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
-      
-      - name: Run tflint
+      - name: Install TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: "v0.53.0"
+
+      - name: TFLint init
+        run: tflint --init
+
+      - name: Run TFLint
         run: tflint --recursive
 
       - name: Run Checkov
-        uses: bridgecrewio/checkov-action@master
+        uses: bridgecrewio/checkov-action@v12
         with:
           directory: .
-          softfail: false
+          soft_fail: false
           framework: terraform
 
   docker-lint:
@@ -52,6 +57,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Run Hadolint
         uses: hadolint/hadolint-action@v3.1.0
         with:
@@ -62,9 +68,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Build Docker image
-        run: |
-          docker build -t app:${{ github.sha }} ./app
+        run: docker build -t app:${{ github.sha }} ./app
 
       - name: Run Trivy scan
         uses: aquasecurity/trivy-action@0.24.0
@@ -73,11 +79,13 @@ jobs:
           format: table
           exit-code: 1
           severity: HIGH,CRITICAL
+
   app-security:
     name: Application Security Scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Run Trivy FS scan (app/)
         uses: aquasecurity/trivy-action@0.24.0
         with:
@@ -98,15 +106,13 @@ jobs:
       - name: Run Gitleaks (Secret Scan)
         uses: gitleaks/gitleaks-action@v2
         with:
-          config-path: ""
-          fail: true
+          args: detect --source . --redact --verbose
 
   docker-compose-test:
     name: Docker Compose Integration Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
 
       - name: Start Docker Compose services
         run: docker compose up -d --build
@@ -133,9 +139,11 @@ jobs:
             exit 1
           fi
           echo "DB check endpoint returned 200 OK"
+
       - name: Tear down services
         if: always()
         run: docker compose down -v
+
   build-and-push:
     name: Build & Push to GHCR
     runs-on: ubuntu-latest
