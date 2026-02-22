@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: pg-local
+    environment:
+      POSTGRES_DB: appdb
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: apppassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U appuser -d appdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: next-local
+    depends_on: 
+      db:
+        condition: service_healthy
+    environment:
+      DB_USER: appuser
+      DB_HOST: db
+      DB_NAME: appdb
+      DB_PASSWORD: apppassword
+      DB_PORT: "5432"
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+
+volumes:
+  pgdata:
