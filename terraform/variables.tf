@@ -1,16 +1,43 @@
-variable "aws_region" { type = string  default = "eu-west-1" }
+variable "aws_region" {
+  type    = string
+  default = "eu-west-1"
+}
 
-variable "app_name"   { type = string }  # e.g. "wavebudget-next"
-variable "env"        { type = string default = "dev" }
+variable "app_name" {
+  type = string
+}
+
+variable "env" {
+  type    = string
+  default = "dev"
+}
 
 # Networking
-variable "vpc_cidr" { type = string default = "10.20.0.0/16" }
+variable "vpc_cidr" {
+  type    = string
+  default = "10.20.0.0/16"
+}
 
 # ECS / App
-variable "container_port" { type = number default = 3000 }
-variable "desired_count"  { type = number default = 1 }
-variable "cpu"            { type = number default = 512 }
-variable "memory"         { type = number default = 1024 }
+variable "container_port" {
+  type    = number
+  default = 3000
+}
+
+variable "desired_count" {
+  type    = number
+  default = 1
+}
+
+variable "cpu" {
+  type    = number
+  default = 512
+}
+
+variable "memory" {
+  type    = number
+  default = 1024
+}
 
 # IMPORTANT: image is passed in tfvars after GHCR build
 variable "image_uri" {
@@ -19,15 +46,36 @@ variable "image_uri" {
 }
 
 # DB config
-variable "db_name" { type = string default = "appdb" }
-variable "db_user" { type = string default = "appuser" }
-variable "db_port" { type = number default = 5432 }
+variable "db_name" {
+  type    = string
+  default = "appdb"
+}
 
-variable "db_instance_class" { type = string default = "db.t4g.micro" }
-variable "db_allocated_storage" { type = number default = 20 }
+variable "db_user" {
+  type    = string
+  default = "appuser"
+}
+
+variable "db_port" {
+  type    = number
+  default = 5432
+}
+
+variable "db_instance_class" {
+  type    = string
+  default = "db.t4g.micro"
+}
+
+variable "db_allocated_storage" {
+  type    = number
+  default = 20
+}
 
 # Public access (ALB)
-variable "alb_listener_port" { type = number default = 80 }
+variable "alb_listener_port" {
+  type    = number
+  default = 80
+}
 
 # Optional: lock down inbound CIDRs to ALB (defaults open)
 variable "alb_ingress_cidrs" {
@@ -35,6 +83,7 @@ variable "alb_ingress_cidrs" {
   default = ["0.0.0.0/0"]
 }
 
+# Observability inputs (BYO resources)
 variable "alb_logs_bucket_name" {
   type        = string
   default     = null
