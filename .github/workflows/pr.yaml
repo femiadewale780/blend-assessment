@@ -20,22 +20,22 @@ jobs:
           terraform_version: "1.6.6"
           terraform_wrapper: false
 
-      # TODO: Run terraform fmt -check
       - name: Terraform fmt (check)
         run: terraform fmt -check -recursive
-      # TODO: Run terraform init -backend=false
+
       - name: Terraform init
         run: terraform init -backend=false
-      # TODO: Run terraform validate
+
       - name: Terraform validate
         run: terraform validate
-      # TODO: Install and run tflint
+
       - name: Install tflint
         run: |
           curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+      
       - name: Run tflint
         run: tflint --recursive
-      # TODO: Run checkov or tfsec against the terraform directory
+
       - name: Run Checkov
         uses: bridgecrewio/checkov-action@master
         with:
@@ -85,6 +85,7 @@ jobs:
           severity: HIGH,CRITICAL
           exit-code: 1
           format: table
+          
   secret-detection:
     name: Secret Detection
     runs-on: ubuntu-latest
