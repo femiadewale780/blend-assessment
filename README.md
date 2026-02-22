@@ -277,3 +277,4 @@ enable_waf   = true
 | IaC Scanning         | ✅      |
 | Git Secret Detection | ✅      |
 
+### Proof of work can be found on the action tab as the docker-compose test passess and the security scans failed because they found issues.
