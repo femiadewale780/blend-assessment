@@ -1,0 +1,16 @@
+aws_region = "eu-west-1"
+
+app_name = "my-next-app"
+env      = "dev"
+
+image_uri = "ghcr.io/myorg/my-next-app:sha-abcdef123"
+
+db_name = "appdb"
+db_user = "appuser"
+
+desired_count = 2
+cpu    = 512
+memory = 1024
+
+container_port = 3000
+alb_ingress_cidrs = ["0.0.0.0/0"]
